@@ -1,9 +1,23 @@
-export default function Home() {
+import { IProducts } from "@/types/products";
+
+export interface HomeProps {
+  products: IProducts[];
+}
+
+export default function Home({ products }: HomeProps) {
   return (
     <ul>
-      <li>Product 1</li>
-      <li>Product 2</li>
-      <li>Product 3</li>
+      {products.map(({ id, title }) => (
+        <li key={id}>{title}</li>
+      ))}
     </ul>
   );
+}
+
+export async function getStaticProps() {
+  return {
+    props: {
+      products: [{ id: "1", title: "Product 1" }],
+    },
+  };
 }
