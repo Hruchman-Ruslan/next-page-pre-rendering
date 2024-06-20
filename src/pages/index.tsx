@@ -1,8 +1,10 @@
+import Link from "next/link";
+
 import { readFile } from "fs/promises";
 
-import { IProducts } from "@/types/products";
-
 import path from "path";
+
+import { IProducts } from "@/types/products";
 
 export interface HomeProps {
   products: IProducts[];
@@ -12,7 +14,9 @@ export default function Home({ products }: HomeProps) {
   return (
     <ul>
       {products.map(({ id, title }) => (
-        <li key={id}>{title}</li>
+        <li key={id}>
+          <Link href={`/${id}`}>{title}</Link>
+        </li>
       ))}
     </ul>
   );
