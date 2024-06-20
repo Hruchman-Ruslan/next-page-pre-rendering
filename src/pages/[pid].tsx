@@ -15,6 +15,10 @@ export interface ProductDetailPageProps {
 export default function ProductDetailPage({
   loadedProduct,
 }: ProductDetailPageProps) {
+  if (!loadedProduct) {
+    return <p>Loading...</p>; // fallback: true,
+  }
+
   const { title, description } = loadedProduct;
 
   return (
@@ -25,18 +29,28 @@ export default function ProductDetailPage({
   );
 }
 
+async function getData() {
+  const filePath = path.join(process.cwd(), "data", "dummy-backend.json");
+  const jsonData = await readFile(filePath);
+  const data = JSON.parse(jsonData.toString());
+
+  return data;
+}
+
 export async function getStaticProps(context: GetStaticPropsContext) {
   const { params } = context;
 
   const productId = params?.pid as string;
 
-  const filePath = path.join(process.cwd(), "data", "dummy-backend.json");
-  const jsonData = await readFile(filePath);
-  const data = JSON.parse(jsonData.toString());
+  const data = await getData();
 
   const product = data.products.find(
     (product: IProducts) => product.id === productId
   );
+
+  if (!product) {
+    return { notFound: true };
+  }
 
   return {
     props: {
@@ -46,12 +60,16 @@ export async function getStaticProps(context: GetStaticPropsContext) {
 }
 
 export async function getStaticPaths() {
+  const data = await getData();
+
+  const ids = data.products.map((product: IProducts) => product.id);
+
+  const pathWithParams = ids.map((id: string) => ({ params: { pid: id } }));
+
   return {
-    paths: [
-      { params: { pid: "p1" } },
-      { params: { pid: "p2" } },
-      { params: { pid: "p3" } },
-    ],
-    fallback: false,
+    paths: pathWithParams,
+    // fallback: false,
+    fallback: true,
+    // fallback: "blocking",
   };
 }
