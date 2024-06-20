@@ -15,6 +15,10 @@ export interface ProductDetailPageProps {
 export default function ProductDetailPage({
   loadedProduct,
 }: ProductDetailPageProps) {
+  // if (!loadedProduct) {
+  //   return <p>Loading...</p>;   // fallback: true,
+  // }
+
   const { title, description } = loadedProduct;
 
   return (
@@ -47,11 +51,9 @@ export async function getStaticProps(context: GetStaticPropsContext) {
 
 export async function getStaticPaths() {
   return {
-    paths: [
-      { params: { pid: "p1" } },
-      { params: { pid: "p2" } },
-      { params: { pid: "p3" } },
-    ],
-    fallback: false,
+    paths: [{ params: { pid: "p1" } }],
+    // fallback: false
+    // fallback: true,
+    fallback: "blocking",
   };
 }
