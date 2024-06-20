@@ -15,9 +15,9 @@ export interface ProductDetailPageProps {
 export default function ProductDetailPage({
   loadedProduct,
 }: ProductDetailPageProps) {
-  // if (!loadedProduct) {
-  //   return <p>Loading...</p>;   // fallback: true,
-  // }
+  if (!loadedProduct) {
+    return <p>Loading...</p>; // fallback: true,
+  }
 
   const { title, description } = loadedProduct;
 
@@ -48,6 +48,10 @@ export async function getStaticProps(context: GetStaticPropsContext) {
     (product: IProducts) => product.id === productId
   );
 
+  if (!product) {
+    return { notFound: true };
+  }
+
   return {
     props: {
       loadedProduct: product,
@@ -64,8 +68,8 @@ export async function getStaticPaths() {
 
   return {
     paths: pathWithParams,
-    fallback: false,
-    // fallback: true,
+    // fallback: false,
+    fallback: true,
     // fallback: "blocking",
   };
 }
