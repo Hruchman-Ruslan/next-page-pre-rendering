@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 
+import type { GetStaticPathsContext } from "next";
+
 import useSWR from "swr";
 
 import { Sale } from "@/types/sale";
 
-export interface LastSalesPageProps {}
+export interface LastSalesPageProps {
+  initialSales: Sale[];
+}
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export default function LastSalesPage({}: LastSalesPageProps) {
-  const [sales, setSales] = useState<Sale[]>([]);
+export default function LastSalesPage({ initialSales }: LastSalesPageProps) {
+  const [sales, setSales] = useState<Sale[]>(initialSales);
   // const [isLoading, setIsLoading] = useState(false);
 
   const { data, error } = useSWR(
@@ -57,7 +61,7 @@ export default function LastSalesPage({}: LastSalesPageProps) {
     return <p>Failed to load.</p>;
   }
 
-  if (!data || !sales) {
+  if (!data && !sales) {
     return <p>Loading...</p>;
   }
 
@@ -70,4 +74,24 @@ export default function LastSalesPage({}: LastSalesPageProps) {
       ))}
     </ul>
   );
+}
+
+export async function getStaticProps(context: GetStaticPathsContext) {
+  const response = await fetch(
+    "https://nextjs-course-af505-default-rtdb.firebaseio.com/sales.json"
+  );
+
+  const data = await response.json();
+
+  const transformedSales: Sale[] = [];
+
+  for (const key in data) {
+    transformedSales.push({
+      id: key,
+      username: data[key].username,
+      volume: data[key].volume,
+    });
+  }
+
+  return { props: { initialSales: transformedSales } };
 }
